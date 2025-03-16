@@ -17,19 +17,19 @@ jobs:
         with:
           python-version: '3.11.9'
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Cache dependencies
+      - name: Cache pip dependencies
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
