@@ -38,11 +38,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
-      - name: Install YDB client
+      - name: Authenticate with YDB
         run: |
-          curl -L https://storage.yandexcloud.net/ydb-python/ydb-client.tar.gz -o ydb-client.tar.gz
-          tar -xvzf ydb-client.tar.gz
-          sudo mv ydb-client /usr/local/bin/ydb
+          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
 
       - name: Run Script
         env:
