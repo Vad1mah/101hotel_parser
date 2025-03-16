@@ -20,11 +20,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-python-
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.9'
-
       - name: Cache pip dependencies
         uses: actions/cache@v3
         with:
@@ -37,6 +32,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          
+      - name: Install YDB client
+        run: |
+          curl -L https://storage.yandexcloud.net/ydb-python/ydb-client.tar.gz -o ydb-client.tar.gz
+          tar -xvzf ydb-client.tar.gz
+          sudo mv ydb-client /usr/local/bin/ydb
 
       - name: Run Script
         env:
