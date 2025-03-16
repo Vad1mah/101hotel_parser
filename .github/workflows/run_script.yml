@@ -2,8 +2,8 @@ name: Run Daily Script
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Запуск каждый день в 3:00 UTC (можно изменить время)
-  workflow_dispatch:  # Возможность ручного запуска
+    - cron: '0 3 * * *'
+  workflow_dispatch:
 
 jobs:
   run-script:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'  # Используй версию Python, совместимую со скриптом
+          python-version: '3.10'
 
       - name: Install Dependencies
         run: |
@@ -35,4 +35,4 @@ jobs:
           YDB_DATABASE: ${{ secrets.YDB_DATABASE }}
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
-        run: python script.py  # Укажи путь к своему скрипту
+        run: python main.py  # Укажи путь к своему скрипту
