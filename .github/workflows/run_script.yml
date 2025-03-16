@@ -1,0 +1,38 @@
+name: Run Daily Script
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Запуск каждый день в 3:00 UTC (можно изменить время)
+  workflow_dispatch:  # Возможность ручного запуска
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'  # Используй версию Python, совместимую со скриптом
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Убедись, что у тебя есть этот файл
+
+      - name: Run Script
+        env:
+          CITIES: "Moscow, Saint-Petersburg"
+          ROOMS_DATA_PATH: "./tables/rooms_data"
+          HOTELS_STATISTICS_PATH: "./tables/hotels_statistics"
+          DATABASE_FILE: "./databases/af_all_2024.csv"
+          CITY_CENTER_AND_SEA_DISTANCES_FILE: "./databases/hotels_city_center_and_sea_distances.csv"
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          YDB_ENDPOINT: ${{ secrets.YDB_ENDPOINT }}
+          YDB_DATABASE: ${{ secrets.YDB_DATABASE }}
+          AUTHORIZED_KEY_PATH: "./authorized_key.json"
+          LOG_FILE_PATH: "./logs/logging.log"
+        run: python script.py  # Укажи путь к своему скрипту
