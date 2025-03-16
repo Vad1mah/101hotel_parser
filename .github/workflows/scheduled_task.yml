@@ -2,7 +2,7 @@ name: Run Daily Script
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '30 2,17 * * *'
   workflow_dispatch:
 
 jobs:
@@ -22,6 +22,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Убедись, что у тебя есть этот файл
 
+      - name: Cache YDB
+        uses: actions/cache@v3
+        with:
+          path: ydb
+          key: ${{ runner.os }}-ydb
+      
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
@@ -35,4 +41,4 @@ jobs:
           YDB_DATABASE: ${{ secrets.YDB_DATABASE }}
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
-        run: python main.py  # Укажи путь к своему скрипту
+        run: python main.py
