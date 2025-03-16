@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Script
         env:
-          CITIES: "Moscow, Saint-Petersburg"
+          CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
           ROOMS_DATA_PATH: "./tables/rooms_data"
           HOTELS_STATISTICS_PATH: "./tables/hotels_statistics"
           DATABASE_FILE: "./databases/af_all_2024.csv"
