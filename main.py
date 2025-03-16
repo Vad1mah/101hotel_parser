@@ -254,7 +254,11 @@ def get_tables_queries(table_name, dir):
     return drop_table_query, create_table_query
     
 def create_ydb_table(drop_table_query, create_table_query, table_name):    
-    driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=ydb.AccessTokenCredentials(IAM_TOKEN))
+    driver_config = ydb.DriverConfig(
+        endpoint=ENDPOINT,
+        database=DATABASE,
+        credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE)
+    )
     
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
