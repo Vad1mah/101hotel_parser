@@ -281,7 +281,7 @@ def import_csv_to_ydb(csv_file_to_import, table_name, ydb_dir):
         "ydb",
         "-e", ENDPOINT,
         "-d", DATABASE,
-        "--sa-key-file", AUTH_TOKEN_PATH,
+        "--sa-key-file", SA_KEY_FILE,
         "import", "file", "csv",
         "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
         "--header", csv_file_to_import
