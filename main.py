@@ -29,8 +29,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
 ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
 DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
 
-AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH", "./authorized_key.json")
-CREDENTIALS = ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH)
+IAM_TOKEN = os.getenv("IAM_TOKEN")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -256,7 +255,7 @@ def get_tables_queries(table_name, dir):
     
 def create_ydb_table(drop_table_query, create_table_query, table_name):    
     
-    driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=CREDENTIALS)
+    driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=IAM_TOKEN)
     
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
