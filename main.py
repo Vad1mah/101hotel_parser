@@ -29,7 +29,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
 ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
 DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
 
-IAM_TOKEN = os.getenv("IAM_TOKEN")
+SA_KEY_FILE = os.getenv("SA_KEY_FILE")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
