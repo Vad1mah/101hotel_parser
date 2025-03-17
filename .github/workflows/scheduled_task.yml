@@ -5,9 +5,6 @@ on:
     - cron: '30 2,17 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: write  # Разрешение на запись в репозиторий
-
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -41,7 +38,10 @@ jobs:
 
       - name: Authenticate with YDB
         run: |
-          curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken
+          echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
+          sudo apt-get update && sudo apt-get install -y jq
+          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
+          echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
@@ -61,14 +61,5 @@ jobs:
           YDB_DATABASE: ${{ secrets.YDB_DATABASE }}
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
+          IAM_TOKEN: ${{ env.IAM_TOKEN }}
         run: python main.py
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Обновление данных: $(date +'%Y-%m-%d %H:%M:%S')"
-          git push origin HEAD
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
