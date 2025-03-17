@@ -29,7 +29,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
 ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
 DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
 
-SA_KEY_FILE = os.getenv("SA_KEY_FILE")
+SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -59,16 +59,16 @@ def update_file_data(new_data, file_path):
         new_data.set_index("id", inplace=True)
 
         db.update(new_data)
-
+        
         new_rows = new_data.loc[~new_data.index.isin(db.index)].dropna(how="all")
         if not new_rows.empty:
             db = pd.concat([db, new_rows])
-
+        
         db.reset_index(inplace=True)
         db = db[column_order]
 
         db.to_csv(file_path, index=False)
-
+        
         logging.info(f"Файл {file_path} обновлен. Обновлено/добавлено строк: {len(new_data)}")
 
     except Exception as e:
@@ -198,7 +198,7 @@ async def get_hotels_info(session, city, start_date, end_date, page):
             if hotels_info_database.empty:
                 logging.warning(f"Нет данных для города {city}, страница {page}")
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), hotels_amount
-
+            
             hotels_rooms_info = pd.json_normalize([extract_room_data(room, hotel.get("id", "")) for hotel in hotels for room in hotel.get("rooms", [])])
             city_distances_info = pd.json_normalize([extract_distances_data(hotel) for hotel in hotels])
             hotels_statistic = pd.json_normalize([extract_statistic_data(hotel.get("rooms", [{}]), hotel.get("id", ""), hotel.get("rooms_num", 0)) for hotel in hotels])
@@ -213,7 +213,7 @@ def get_tables_queries(table_name, dir):
     PRAGMA TablePathPrefix("{DATABASE}/{dir}");
     DROP TABLE {table_name};
     """
-
+        
     if dir == "rooms_data":
         create_table_query = f"""
         PRAGMA TablePathPrefix("{DATABASE}/{dir}");
@@ -250,20 +250,20 @@ def get_tables_queries(table_name, dir):
             PRIMARY KEY (id)
         );
         """
-
+        
     return drop_table_query, create_table_query
-
+    
 def create_ydb_table(drop_table_query, create_table_query, table_name):    
     driver_config = ydb.DriverConfig(
         endpoint=ENDPOINT,
         database=DATABASE,
         credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE)
     )
-
+    
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
         session = driver.table_client.session().create()
-
+        
         try:
             session.execute_scheme(drop_table_query)
             logging.info(f"Таблица {table_name} удалена перед созданием новой.")
@@ -275,7 +275,7 @@ def create_ydb_table(drop_table_query, create_table_query, table_name):
             logging.info(f"Таблица {table_name} успешно создана.")
         except Exception as e:
             logging.error(f"Не удалось создать таблицу {table_name}: {e}")
-
+            
 def import_csv_to_ydb(csv_file_to_import, table_name, ydb_dir):
     command = [
         "ydb",
@@ -317,7 +317,7 @@ async def parse_101hotels_async():
                         hotels_info_database, hotels_rooms_info, city_distances_info, hotels_statistic, hotels_amount = await get_hotels_info(session, city, start_date, end_date, page)
                         if hotels_amount == 0:
                             break
-
+                        
                         city_hotels_data_database.append(hotels_info_database)
                         city_rooms_data.append(hotels_rooms_info)
                         hotels_distances_data.append(city_distances_info)
@@ -345,30 +345,30 @@ async def parse_101hotels_async():
             df_all_rooms = pd.concat(rooms_combined_data_dashboard, ignore_index=True).drop_duplicates(subset='id', keep='first')
             df_all_distances = pd.concat(hotels_combined_distances_data, ignore_index=True).drop_duplicates(subset='id', keep='first')
             df_all_statistic = pd.concat(cities_combined_statistic, ignore_index=True).drop_duplicates(subset='id', keep='first')
-
+            
             rooms_data_file_path = os.path.join(ROOMS_DATA_PATH, f"rooms_data_{start_date}.csv")
             df_all_rooms.to_csv(rooms_data_file_path, index=False)
             hotels_statistic_file_path = os.path.join(HOTELS_STATISTICS_PATH, f"hotels_statistic_{start_date}.csv")
             df_all_statistic.to_csv(hotels_statistic_file_path, index=False)
-
+            
             update_file_data(df_all_database, DATABASE_FILE_PATH)
             update_file_data(df_all_distances, DISTANCES_FILE_PATH)
             await send_telegram_message(f"Парсинг завершён, файлы базы данных и дистанций обновлены")
-
+            
             rooms_data_table_name = f"rooms_data_{today.strftime('%d_%m_%Y')}"
             hotels_statistic_table_name = f"hotels_statistic_{today.strftime('%d_%m_%Y')}"
-
+            
             drop_table_query, create_table_query = get_tables_queries(rooms_data_table_name, dir="rooms_data")
             create_ydb_table(drop_table_query, create_table_query, table_name=rooms_data_table_name)
-
+            
             drop_table_query, create_table_query = get_tables_queries(hotels_statistic_table_name, dir="hotels_statistics")
             create_ydb_table(drop_table_query, create_table_query, table_name=hotels_statistic_table_name)
-
+ 
             import_csv_to_ydb(rooms_data_file_path, rooms_data_table_name, ydb_dir="rooms_data")
             await send_telegram_message(f"Таблица {rooms_data_table_name} создана")
             import_csv_to_ydb(hotels_statistic_file_path, hotels_statistic_table_name, ydb_dir="hotels_statistics")
             await send_telegram_message(f"Таблица {hotels_statistic_table_name} создана")
-
+            
     except Exception as e:
         logging.error(f"Ошибка при парсинге всех городов: {e}")
         if bot:
