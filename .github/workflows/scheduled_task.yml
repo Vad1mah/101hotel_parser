@@ -5,6 +5,11 @@ on:
     - cron: '30 2,17 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: write
+  checks: write
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -18,15 +23,27 @@ jobs:
           python-version: '3.11.9'
           cache: 'pip'
 
+      - name: Cache YDB CLI
+        id: ydb-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/ydb
+          key: ydb-cli-${{ runner.os }}-${{ hashFiles('**/install_ydb.sh') }}
+
       - name: Install YDB CLI
+        if: steps.ydb-cache.outputs.cache-hit != 'true'
         run: |
-          curl -sSL https://install.ydb.tech/cli | bash
-          echo "$HOME/ydb/bin" >> $GITHUB_PATH
-          
+          mkdir -p ${{ runner.tool_cache }}/ydb
+          curl -sSL https://install.ydb.tech/cli | bash -s -- -d ${{ runner.tool_cache }}/ydb
+          echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
+
+      - name: Add YDB CLI to PATH
+        if: steps.ydb-cache.outputs.cache-hit == 'true'
+        run: echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
+
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-          
+        run: pip install -r requirements.txt
+
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
@@ -41,3 +58,13 @@ jobs:
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
         run: python main.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Обновление данных: $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin HEAD
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
