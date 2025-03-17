@@ -2,8 +2,13 @@ name: Run Daily Script
 
 on:
   schedule:
-    - cron: '30 2,17 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  checks: write
 
 jobs:
   run-script:
@@ -11,7 +16,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -22,11 +27,12 @@ jobs:
         run: |
           curl -sSL https://install.ydb.tech/cli | bash
           echo "$HOME/ydb/bin" >> $GITHUB_PATH
-          
+
       - name: Install Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+  
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
@@ -41,3 +47,11 @@ jobs:
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
         run: python main.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Обновление данных: $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin HEAD
