@@ -12,56 +12,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Кэшируем Python
-      - name: Cache Python
-        id: cache-python
-        uses: actions/cache@v4
-        with:
-          path: ~/.pyenv
-          key: python-3.11-${{ runner.os }}
-
       - name: Set up Python
-        if: steps.cache-python.outputs.cache-hit != 'true'
-        run: |
-          sudo apt update
-          sudo apt install -y python3.11 python3.11-venv python3.11-dev
-          python3.11 -m venv ~/.pyenv
-          echo "PYTHON_HOME=$HOME/.pyenv" >> $GITHUB_ENV
-          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
-
-      - name: Activate Python
-        run: echo "PYTHON_HOME=$HOME/.pyenv" >> $GITHUB_ENV
-
-      # Кэшируем зависимости pip
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: '3.11.9'
+          cache: 'pip'
 
-      - name: Install Dependencies
-        run: |
-          source $PYTHON_HOME/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # Кэшируем YDB CLI
       - name: Cache YDB CLI
-        id: cache-ydb
+        id: ydb-cache
         uses: actions/cache@v4
         with:
-          path: ~/.ydb
-          key: ydb-cli-${{ runner.os }}
+          path: ${{ runner.tool_cache }}/ydb
+          key: ydb-cli-${{ runner.os }}-${{ hashFiles('**/install_ydb.sh') }}
 
       - name: Install YDB CLI
-        if: steps.cache-ydb.outputs.cache-hit != 'true'
+        if: steps.ydb-cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/.ydb
-          curl -sSL https://storage.yandexcloud.net/ydb-cli/ydb-linux-amd64-latest -o ~/.ydb/ydb
-          chmod +x ~/.ydb/ydb
-          echo "$HOME/.ydb" >> $GITHUB_PATH
+          mkdir -p ${{ runner.tool_cache }}/ydb
+          curl -sSL https://install.ydb.tech/cli | bash -s -- -d ${{ runner.tool_cache }}/ydb
+          echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
+
+      - name: Add YDB CLI to PATH
+        if: steps.ydb-cache.outputs.cache-hit == 'true'
+        run: echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
 
       - name: Authenticate with YDB
         run: |
@@ -69,6 +42,11 @@ jobs:
           sudo apt-get update && sudo apt-get install -y jq
           export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
           echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Run Script
         env:
@@ -84,6 +62,4 @@ jobs:
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
           IAM_TOKEN: ${{ env.IAM_TOKEN }}
-        run: |
-          source $PYTHON_HOME/bin/activate
-          python main.py
+        run: python main.py
