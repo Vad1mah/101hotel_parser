@@ -16,12 +16,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: |
-          python -m ensurepip --upgrade
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
       
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -48,6 +42,12 @@ jobs:
         if: steps.ydb-cache.outputs.cache-hit == 'true'
         run: echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
 
+      - name: Install Dependencies
+        run: |
+          python -m ensurepip --upgrade
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+  
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
