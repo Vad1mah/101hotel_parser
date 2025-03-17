@@ -29,6 +29,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 ENDPOINT = os.getenv("YDB_ENDPOINT")
 DATABASE = os.getenv("YDB_DATABASE")
 SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
+IAM_TOKEN = os.getenv("IAM_TOKEN")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -256,7 +257,7 @@ def create_ydb_table(drop_table_query, create_table_query, table_name):
     driver_config = ydb.DriverConfig(
         endpoint=ENDPOINT,
         database=DATABASE,
-        credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE)
+        credentials=ydb.AccessTokenCredentials(IAM_TOKEN)
     )
     
     with ydb.Driver(driver_config) as driver:
