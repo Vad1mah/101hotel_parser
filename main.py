@@ -17,18 +17,17 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 load_dotenv()
-CITIES = os.getenv("CITIES", "").split(",")
-ROOMS_DATA_PATH = os.getenv("ROOMS_DATA_PATH", "./tables/rooms_data")
-HOTELS_STATISTICS_PATH = os.getenv("HOTELS_STATISTICS_PATH", "./tables/hotels_statistics")
-DATABASE_FILE_PATH = os.getenv("DATABASE_FILE", "./databases/af_all_2024.csv")
-DISTANCES_FILE_PATH = os.getenv("CITY_CENTER_AND_SEA_DISTANCES_FILE", "./databases/hotels_city_center_and_sea_distances.csv")
+CITIES = os.getenv("CITIES").split(",")
+ROOMS_DATA_PATH = os.getenv("ROOMS_DATA_PATH")
+HOTELS_STATISTICS_PATH = os.getenv("HOTELS_STATISTICS_PATH")
+DATABASE_FILE_PATH = os.getenv("DATABASE_FILE")
+DISTANCES_FILE_PATH = os.getenv("CITY_CENTER_AND_SEA_DISTANCES_FILE")
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
-DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
-
+ENDPOINT = os.getenv("YDB_ENDPOINT")
+DATABASE = os.getenv("YDB_DATABASE")
 SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
