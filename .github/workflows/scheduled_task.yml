@@ -16,31 +16,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
-        id: python
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-${{ runner.os }}-
-            pip-cache-
+          cache: 'pip'
 
       - name: Install YDB CLI
         run: |
           curl -sSL https://install.ydb.tech/cli | bash
           echo "$HOME/ydb/bin" >> $GITHUB_PATH
-      - name: Authenticate with YDB
-        run: |
-          echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
-          sudo apt-get update && sudo apt-get install -y jq
-          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
-          echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
+          
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          
       - name: Run Script
         env:
           CITIES: "huzhir,sahyurta,harantsi,sarma,kurma,buguldeyka,shida,agaluy,sayansk,slyudyanka,baikalsk,utulik,mangutay,kultuk,baykal,angarsk,savvateevka,leestvyanka,irkutsk,nikola,bolshoe_goloustnoe,granovshchina,hayryuzovka,bolshie_koti,patroni,ust-ilimsk"
@@ -54,5 +40,4 @@ jobs:
           YDB_DATABASE: ${{ secrets.YDB_DATABASE }}
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
-          IAM_TOKEN: ${{ env.IAM_TOKEN }}
         run: python main.py
