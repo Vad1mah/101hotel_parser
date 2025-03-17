@@ -29,14 +29,13 @@ jobs:
         with:
           path: ${{ runner.tool_cache }}/ydb
           key: ydb-cli-${{ runner.os }}-${{ hashFiles('**/install_ydb.sh') }}
-          restore-keys: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.9-pip-7deccac768bd0da446f6dfdb4484170def9f2689fe7c8390c54c42fbc0abcaf0
 
       - name: Install YDB CLI
         if: steps.ydb-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${{ runner.tool_cache }}/ydb
           curl -sSL https://install.ydb.tech/cli | bash -s -- -d ${{ runner.tool_cache }}/ydb
-          echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
+          echo "$HOME/ydb/bin" >> $GITHUB_PATH
 
       - name: Add YDB CLI to PATH
         if: steps.ydb-cache.outputs.cache-hit == 'true'
