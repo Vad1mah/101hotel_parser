@@ -2,7 +2,7 @@ name: Run Daily Script
 
 on:
   schedule:
-    - cron: '30 2,17 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -23,23 +23,15 @@ jobs:
           python-version: '3.11.9'
           cache: 'pip'
 
-      - name: Cache YDB CLI
-        id: ydb-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.tool_cache }}/ydb
-          key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.9-pip-7deccac768bd0da446f6dfdb4484170def9f2689fe7c8390c54c42fbc0abcaf0
-
       - name: Install YDB CLI
         if: steps.ydb-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${{ runner.tool_cache }}/ydb
-          curl -sSL https://install.ydb.tech/cli | bash -s -- -d ${{ runner.tool_cache }}/ydb
+          curl -sSL https://install.ydb.tech/cli | bash
           echo "$HOME/ydb/bin" >> $GITHUB_PATH
 
       - name: Install Dependencies
         run: |
-          python -m ensurepip --upgrade
           python -m pip install --upgrade pip
           pip install -r requirements.txt
   
