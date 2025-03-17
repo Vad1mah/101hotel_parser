@@ -167,6 +167,7 @@ def extract_statistic_data(rooms, hotel_id, rooms_num):
         max_capacity = sum(room.get("free", 0) * room.get("capacity", 0) for room in rooms)
         return {
             "id": f"{hotel_id}_101hotels",
+            "rooms_num": rooms_num,
             "free_rooms_amount": free_rooms_amount,
             "rooms_occupancy_percent": rooms_occupancy_percent,
             "max_capacity": max_capacity
@@ -244,6 +245,7 @@ def get_tables_queries(table_name, dir):
 
         CREATE TABLE {table_name} (
             id Utf8 NOT NULL,
+            rooms_num Int16,
             free_rooms_amount Int16,
             rooms_occupancy_percent Float,
             max_capacity Int16,
