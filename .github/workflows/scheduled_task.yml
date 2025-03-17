@@ -12,16 +12,39 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Cache Python
+        id: cache-python
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/Python/3.11.9
+          key: python-3.11.9-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: |
+            python-3.11.9-${{ runner.os }}-
+            python-3.11.9-
+
       - name: Set up Python
+        if: steps.cache-python.outputs.cache-hit != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
           cache: 'pip'
 
+      - name: Cache YDB CLI
+        id: cache-ydb
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.tool_cache }}/ydb
+          key: ydb-${{ runner.os }}-${{ runner.arch }}-v2.19.0
+          restore-keys: |
+            ydb-${{ runner.os }}-${{ runner.arch }}-
+            ydb-${{ runner.os }}-
+
       - name: Install YDB CLI
+        if: steps.cache-ydb.outputs.cache-hit != 'true'
         run: |
-          curl -sSL https://install.ydb.tech/cli | bash
-          echo "$HOME/ydb/bin" >> $GITHUB_PATH
+          mkdir -p ${{ runner.tool_cache }}/ydb
+          curl -sSL https://install.ydb.tech/cli/2.19.0 | bash -s -- -d ${{ runner.tool_cache }}/ydb
+          echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
 
       - name: Authenticate with YDB
         run: |
