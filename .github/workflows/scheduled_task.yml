@@ -29,6 +29,7 @@ jobs:
         with:
           path: ${{ runner.tool_cache }}/ydb
           key: ydb-cli-${{ runner.os }}-${{ hashFiles('**/install_ydb.sh') }}
+          cache: 'pip'
 
       - name: Install YDB CLI
         if: steps.ydb-cache.outputs.cache-hit != 'true'
