@@ -18,27 +18,16 @@ jobs:
           python-version: '3.11.9'
           cache: 'pip'
 
-      - name: Cache YDB CLI
-        id: cache-ydb
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.tool_cache }}/ydb
-          key: ydb-${{ runner.os }}-${{ runner.arch }}-v2.19.0
-          restore-keys: |
-            ydb-${{ runner.os }}-${{ runner.arch }}-
-            ydb-${{ runner.os }}-
-
       - name: Install YDB CLI
-        if: steps.cache-ydb.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ${{ runner.tool_cache }}/ydb
-          curl -sSL https://install.ydb.tech/cli/2.19.0 | bash -s -- -d ${{ runner.tool_cache }}/ydb
-          echo "${{ runner.tool_cache }}/ydb/bin" >> $GITHUB_PATH
+          curl -sSL https://install.ydb.tech/cli | bash
+          echo "$HOME/ydb/bin" >> $GITHUB_PATH
 
       - name: Authenticate with YDB
         run: |
           echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
-          IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
+          sudo apt-get update && sudo apt-get install -y jq
+          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
           echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
 
       - name: Install Dependencies
