@@ -16,48 +16,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
+          cache: 'pip'
 
-      - name: Cache Python installation
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/python
-          key: ${{ runner.os }}-python-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-python-
+      - name: Install YDB CLI
+        run: |
+          curl -sSL https://install.ydb.tech/cli | bash
+          echo "$HOME/ydb/bin" >> $GITHUB_PATH
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      - name: Authenticate with YDB
+        run: |
+          echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
+          sudo apt-get update && sudo apt-get install -y jq
+          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
+          echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install YDB CLI
-        run: |
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-ydb/ydb-linux-amd64 -o ydb
-          chmod +x ydb
-          sudo mv ydb /usr/local/bin/
-
-      - name: Verify YDB Installation
-        run: which ydb || echo "YDB CLI not found"
-
-      - name: Install jq (for JSON parsing)
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Authenticate with YDB
-        run: |
-          echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
-          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
-          echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
-
-      - name: Set SA_KEY_FILE environment variable
-        run: echo "SA_KEY_FILE=./authorized_key.json" >> $GITHUB_ENV
 
       - name: Run Script
         env:
@@ -73,5 +49,4 @@ jobs:
           AUTHORIZED_KEY_PATH: "./authorized_key.json"
           LOG_FILE_PATH: "./logs/logging.log"
           IAM_TOKEN: ${{ env.IAM_TOKEN }}
-          SA_KEY_FILE: ${{ env.SA_KEY_FILE }}
         run: python main.py
