@@ -55,5 +55,3 @@ jobs:
           git add .
           git diff --quiet && git diff --staged --quiet || git commit -m "Обновление данных: $(date +'%Y-%m-%d %H:%M:%S')"
           git push origin HEAD
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
