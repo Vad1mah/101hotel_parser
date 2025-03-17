@@ -12,18 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Cache Python
-        id: cache-python
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/Python/3.11.9
-          key: python-3.11.9-${{ runner.os }}-${{ runner.arch }}
-          restore-keys: |
-            python-3.11.9-${{ runner.os }}-
-            python-3.11.9-
-
       - name: Set up Python
-        if: steps.cache-python.outputs.cache-hit != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
@@ -49,8 +38,7 @@ jobs:
       - name: Authenticate with YDB
         run: |
           echo '${{ secrets.AUTHORIZED_KEY_JSON }}' > authorized_key.json
-          sudo apt-get update && sudo apt-get install -y jq
-          export IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
+          IAM_TOKEN=$(curl -s -d "@authorized_key.json" "https://iam.api.cloud.yandex.net/iam/v1/tokens" | jq -r .iamToken)
           echo "IAM_TOKEN=${IAM_TOKEN}" >> $GITHUB_ENV
 
       - name: Install Dependencies
