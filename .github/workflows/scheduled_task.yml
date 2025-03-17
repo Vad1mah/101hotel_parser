@@ -16,7 +16,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11.9'
-          cache: 'pip'
+        id: python
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            pip-cache-${{ runner.os }}-
+            pip-cache-
 
       - name: Install YDB CLI
         run: |
