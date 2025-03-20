@@ -24,14 +24,13 @@ HOTELS_STATISTICS_PATH = os.getenv("HOTELS_STATISTICS_PATH", "./tables/hotels_st
 DATABASE_FILE_PATH = os.getenv("DATABASE_FILE", "./databases/af_all_2024.csv")
 DISTANCES_FILE_PATH = os.getenv("CITY_CENTER_AND_SEA_DISTANCES_FILE", "./databases/hotels_city_center_and_sea_distances.csv")
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
 
-ENDPOINT = os.getenv("YDB_ENDPOINT")
-DATABASE = os.getenv("YDB_DATABASE")
+ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
+DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
 
-AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH")
-CREDENTIALS = ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH)
+SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -291,7 +290,7 @@ def upsert_csv_to_ydb(driver_config, csv_file_to_import, table_name, ydb_dir, da
             "ydb",
             "-e", ENDPOINT,
             "-d", DATABASE,
-            "--sa-key-file", AUTH_TOKEN_PATH,
+            "--sa-key-file", SA_KEY_FILE,
             "import", "file", "csv",
             "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
             "--header", csv_file_to_import
@@ -370,7 +369,7 @@ async def parse_101hotels_async():
             rooms_data_table_name = "rooms_data"
             hotels_statistic_table_name = "hotels_statistics"
             
-            driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=CREDENTIALS)
+            driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE))
             create_table_query = get_tables_queries("rooms_data", dir="rooms_data")
             create_ydb_table(driver_config, create_table_query, table_name="rooms_data")
             
