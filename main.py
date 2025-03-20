@@ -8,6 +8,7 @@ import aiohttp
 from dotenv import load_dotenv
 from telegram import Bot
 import sys
+from datetime import datetime
 
 import ydb
 import ydb.iam
@@ -23,13 +24,14 @@ HOTELS_STATISTICS_PATH = os.getenv("HOTELS_STATISTICS_PATH", "./tables/hotels_st
 DATABASE_FILE_PATH = os.getenv("DATABASE_FILE", "./databases/af_all_2024.csv")
 DISTANCES_FILE_PATH = os.getenv("CITY_CENTER_AND_SEA_DISTANCES_FILE", "./databases/hotels_city_center_and_sea_distances.csv")
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
-DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
+ENDPOINT = os.getenv("YDB_ENDPOINT")
+DATABASE = os.getenv("YDB_DATABASE")
 
-SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
+AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH")
+CREDENTIALS = ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH)
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -119,7 +121,7 @@ def extract_hotel_data(hotel):
         logging.error(f"Ошибка при извлечении данных для отеля {hotel.get('id', 'Неизвестно')}: {e}")
         return {}
 
-def extract_room_data(room, hotel_id):
+def extract_room_data(date, room, hotel_id):
     try:
         return {
             "id": room.get("id", None),
@@ -137,7 +139,8 @@ def extract_room_data(room, hotel_id):
             "placements": room.get("placements", None),
             "min_price": room.get("min_price", None),
             "miles": room.get("miles", None),
-            "hotel_id": f"{hotel_id}_101hotels"
+            "hotel_id": f"{hotel_id}_101hotels",
+            "date": date
         }
     except Exception as e:
         logging.error(f"Ошибка при извлечении данных для номера отеля {hotel_id}: {e}")
@@ -160,7 +163,7 @@ def extract_distances_data(hotel):
         logging.error(f"Ошибка при извлечении данных для отеля {hotel.get('id', 'Неизвестно')}: {e}")
         return {}
 
-def extract_statistic_data(rooms, hotel_id, rooms_num):
+def extract_statistic_data(date, rooms, hotel_id, rooms_num):
     try:
         free_rooms_amount = sum(room.get("free", 0) if room.get("single_bed", 0) == 0 else 1 for room in rooms)
         rooms_occupancy_percent = free_rooms_amount * 100 / rooms_num
@@ -170,13 +173,14 @@ def extract_statistic_data(rooms, hotel_id, rooms_num):
             "rooms_num": rooms_num,
             "free_rooms_amount": free_rooms_amount,
             "rooms_occupancy_percent": rooms_occupancy_percent,
-            "max_capacity": max_capacity
+            "max_capacity": max_capacity,
+            "date": date
         }
     except Exception as e:
         logging.error(f"Ошибка при извлечении данных для номера отеля {hotel_id}: {e}")
         return {}
 
-async def get_hotels_info(session, city, start_date, end_date, page):
+async def get_hotels_info(session, city, extract_date, start_date, end_date, page):
     try:
         url = f"https://api.101hotels.com/hotel/available/city/russia/{city}?sort_direction=desc&in={start_date}&out={end_date}&adults=1&page={page}"
         async with session.get(url) as response:
@@ -200,9 +204,9 @@ async def get_hotels_info(session, city, start_date, end_date, page):
                 logging.warning(f"Нет данных для города {city}, страница {page}")
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), hotels_amount
             
-            hotels_rooms_info = pd.json_normalize([extract_room_data(room, hotel.get("id", "")) for hotel in hotels for room in hotel.get("rooms", [])])
+            hotels_rooms_info = pd.json_normalize([extract_room_data(extract_date, room, hotel.get("id", "")) for hotel in hotels for room in hotel.get("rooms", [])])
             city_distances_info = pd.json_normalize([extract_distances_data(hotel) for hotel in hotels])
-            hotels_statistic = pd.json_normalize([extract_statistic_data(hotel.get("rooms", [{}]), hotel.get("id", ""), hotel.get("rooms_num", 0)) for hotel in hotels])
+            hotels_statistic = pd.json_normalize([extract_statistic_data(extract_date, hotel.get("rooms", [{}]), hotel.get("id", ""), hotel.get("rooms_num", 0)) for hotel in hotels])
             return hotels_info_database, hotels_rooms_info, city_distances_info, hotels_statistic, hotels_amount
 
     except Exception as e:
@@ -210,16 +214,11 @@ async def get_hotels_info(session, city, start_date, end_date, page):
         return pd.DataFrame(), 0
 
 def get_tables_queries(table_name, dir):
-    drop_table_query = f"""
-    PRAGMA TablePathPrefix("{DATABASE}/{dir}");
-    DROP TABLE {table_name};
-    """
-        
     if dir == "rooms_data":
         create_table_query = f"""
         PRAGMA TablePathPrefix("{DATABASE}/{dir}");
 
-        CREATE TABLE {table_name} (
+        CREATE TABLE IF NOT EXISTS {table_name} (
             id Int64 NOT NULL,
             k Int64,
             name Utf8,
@@ -236,41 +235,35 @@ def get_tables_queries(table_name, dir):
             min_price Float,
             miles Int64,
             hotel_id Utf8 NOT NULL,
-            PRIMARY KEY (id)
+            date Date NOT NULL,
+            PRIMARY KEY (id, date)
+        ) WITH (
+            AUTO_PARTITIONING_BY_LOAD = ENABLED
         );
         """
     elif dir == "hotels_statistics":
         create_table_query = f"""
         PRAGMA TablePathPrefix("{DATABASE}/{dir}");
 
-        CREATE TABLE {table_name} (
+        CREATE TABLE IF NOT EXISTS {table_name} (
             id Utf8 NOT NULL,
             rooms_num Int16,
             free_rooms_amount Int16,
             rooms_occupancy_percent Float,
             max_capacity Int16,
-            PRIMARY KEY (id)
+            date Date NOT NULL,
+            PRIMARY KEY (id, date)
+        ) WITH (
+            AUTO_PARTITIONING_BY_LOAD = ENABLED
         );
         """
         
-    return drop_table_query, create_table_query
+    return create_table_query
     
-def create_ydb_table(drop_table_query, create_table_query, table_name):    
-    driver_config = ydb.DriverConfig(
-        endpoint=ENDPOINT,
-        database=DATABASE,
-        credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE)
-    )
-    
+def create_ydb_table(driver_config, create_table_query, table_name):    
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
         session = driver.table_client.session().create()
-        
-        try:
-            session.execute_scheme(drop_table_query)
-            logging.info(f"Таблица {table_name} удалена перед созданием новой.")
-        except Exception as e:
-            logging.warning(f"Не удалось удалить таблицу {table_name} (возможно, её не существует): {e}")
 
         try:
             session.execute_scheme(create_table_query)
@@ -278,21 +271,37 @@ def create_ydb_table(drop_table_query, create_table_query, table_name):
         except Exception as e:
             logging.error(f"Не удалось создать таблицу {table_name}: {e}")
             
-def import_csv_to_ydb(csv_file_to_import, table_name, ydb_dir):
-    command = [
-        "ydb",
-        "-e", ENDPOINT,
-        "-d", DATABASE,
-        "--sa-key-file", SA_KEY_FILE,
-        "import", "file", "csv",
-        "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
-        "--header", csv_file_to_import
-    ]
-    try:
-        subprocess.run(command, check=True, text=True, capture_output=True)
-        logging.info("Импорт CSV В YDB произошёл успешно")
-    except subprocess.CalledProcessError as e:
-        logging.error("Не удалось импортировать CSV В YDB:", e.stderr)
+def upsert_csv_to_ydb(driver_config, csv_file_to_import, table_name, ydb_dir, date):
+    with ydb.Driver(driver_config) as driver:
+        driver.wait(fail_fast=True, timeout=20)
+        session = driver.table_client.session().create()
+
+        delete_old_data = f"""
+        PRAGMA TablePathPrefix("{DATABASE}/{ydb_dir}");
+        DELETE FROM {table_name} WHERE date = Date('{date}');
+        """
+
+        try:
+            session.transaction().execute(delete_old_data, commit_tx=True)
+            logging.info(f"Удалены старые данные за {date} в {table_name}.")
+        except Exception as e:
+            logging.warning(f"Не удалось удалить старые данные за {date}: {e}")
+
+        command = [
+            "ydb",
+            "-e", ENDPOINT,
+            "-d", DATABASE,
+            "--sa-key-file", AUTH_TOKEN_PATH,
+            "import", "file", "csv",
+            "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
+            "--header", csv_file_to_import
+        ]
+        
+        try:
+            subprocess.run(command, check=True, text=True, capture_output=True)
+            logging.info("Импорт CSV в YDB прошёл успешно")
+        except subprocess.CalledProcessError as e:
+            logging.error("Ошибка импорта CSV в YDB:", e.stderr)
 
 async def parse_101hotels_async():
     try:
@@ -300,6 +309,7 @@ async def parse_101hotels_async():
         next_day = today + dt.timedelta(days=1)
         start_date = today.strftime("%d.%m.%Y")
         end_date = next_day.strftime("%d.%m.%Y")
+        extract_date = datetime.today().strftime('%Y-%m-%d')
 
         cities_combined_data_database = []
         rooms_combined_data_dashboard = []
@@ -316,7 +326,7 @@ async def parse_101hotels_async():
                     page = 1
                     hotels_amount = 1
                     while sum(len(hotel) for hotel in city_hotels_data_database) < hotels_amount:
-                        hotels_info_database, hotels_rooms_info, city_distances_info, hotels_statistic, hotels_amount = await get_hotels_info(session, city, start_date, end_date, page)
+                        hotels_info_database, hotels_rooms_info, city_distances_info, hotels_statistic, hotels_amount = await get_hotels_info(session, city, extract_date, start_date, end_date, page)
                         if hotels_amount == 0:
                             break
                         
@@ -357,18 +367,19 @@ async def parse_101hotels_async():
             update_file_data(df_all_distances, DISTANCES_FILE_PATH)
             await send_telegram_message(f"Парсинг завершён, файлы базы данных и дистанций обновлены")
             
-            rooms_data_table_name = f"rooms_data_{today.strftime('%d_%m_%Y')}"
-            hotels_statistic_table_name = f"hotels_statistic_{today.strftime('%d_%m_%Y')}"
+            rooms_data_table_name = "rooms_data"
+            hotels_statistic_table_name = "hotels_statistics"
             
-            drop_table_query, create_table_query = get_tables_queries(rooms_data_table_name, dir="rooms_data")
-            create_ydb_table(drop_table_query, create_table_query, table_name=rooms_data_table_name)
+            driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=CREDENTIALS)
+            create_table_query = get_tables_queries("rooms_data", dir="rooms_data")
+            create_ydb_table(driver_config, create_table_query, table_name="rooms_data")
             
-            drop_table_query, create_table_query = get_tables_queries(hotels_statistic_table_name, dir="hotels_statistics")
-            create_ydb_table(drop_table_query, create_table_query, table_name=hotels_statistic_table_name)
- 
-            import_csv_to_ydb(rooms_data_file_path, rooms_data_table_name, ydb_dir="rooms_data")
+            create_table_query = get_tables_queries("hotels_statistics", dir="hotels_statistics")
+            create_ydb_table(driver_config, create_table_query, table_name="hotels_statistics")
+
+            upsert_csv_to_ydb(driver_config, rooms_data_file_path, rooms_data_table_name, "rooms_data", extract_date)
             await send_telegram_message(f"Таблица {rooms_data_table_name} создана")
-            import_csv_to_ydb(hotels_statistic_file_path, hotels_statistic_table_name, ydb_dir="hotels_statistics")
+            upsert_csv_to_ydb(driver_config, hotels_statistic_file_path, hotels_statistic_table_name, "hotels_statistics", extract_date)
             await send_telegram_message(f"Таблица {hotels_statistic_table_name} создана")
             
     except Exception as e:
