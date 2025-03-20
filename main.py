@@ -30,7 +30,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
 ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
 DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
 
-SA_KEY_FILE = os.getenv("AUTHORIZED_KEY_PATH")
+AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH", "./authorized_key.json")
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
 logging.basicConfig(
@@ -259,7 +259,9 @@ def get_tables_queries(table_name, dir):
         
     return create_table_query
     
-def create_ydb_table(driver_config, create_table_query, table_name):    
+def create_ydb_table(create_table_query, table_name):    
+    driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH))
+    
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
         session = driver.table_client.session().create()
@@ -270,7 +272,9 @@ def create_ydb_table(driver_config, create_table_query, table_name):
         except Exception as e:
             logging.error(f"Не удалось создать таблицу {table_name}: {e}")
             
-def upsert_csv_to_ydb(driver_config, csv_file_to_import, table_name, ydb_dir, date):
+def upsert_csv_to_ydb(csv_file_to_import, table_name, ydb_dir, date):
+    driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH))
+    
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
         session = driver.table_client.session().create()
@@ -290,7 +294,7 @@ def upsert_csv_to_ydb(driver_config, csv_file_to_import, table_name, ydb_dir, da
             "ydb",
             "-e", ENDPOINT,
             "-d", DATABASE,
-            "--sa-key-file", SA_KEY_FILE,
+            "--sa-key-file", AUTH_TOKEN_PATH,
             "import", "file", "csv",
             "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
             "--header", csv_file_to_import
@@ -369,16 +373,16 @@ async def parse_101hotels_async():
             rooms_data_table_name = "rooms_data"
             hotels_statistic_table_name = "hotels_statistics"
             
-            driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=ydb.iam.ServiceAccountCredentials.from_file(SA_KEY_FILE))
+            
             create_table_query = get_tables_queries("rooms_data", dir="rooms_data")
-            create_ydb_table(driver_config, create_table_query, table_name="rooms_data")
+            create_ydb_table(create_table_query, table_name="rooms_data")
             
             create_table_query = get_tables_queries("hotels_statistics", dir="hotels_statistics")
-            create_ydb_table(driver_config, create_table_query, table_name="hotels_statistics")
+            create_ydb_table(create_table_query, table_name="hotels_statistics")
 
-            upsert_csv_to_ydb(driver_config, rooms_data_file_path, rooms_data_table_name, "rooms_data", extract_date)
+            upsert_csv_to_ydb(rooms_data_file_path, rooms_data_table_name, "rooms_data", extract_date)
             await send_telegram_message(f"Таблица {rooms_data_table_name} создана")
-            upsert_csv_to_ydb(driver_config, hotels_statistic_file_path, hotels_statistic_table_name, "hotels_statistics", extract_date)
+            upsert_csv_to_ydb(hotels_statistic_file_path, hotels_statistic_table_name, "hotels_statistics", extract_date)
             await send_telegram_message(f"Таблица {hotels_statistic_table_name} создана")
             
     except Exception as e:
