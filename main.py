@@ -23,14 +23,15 @@ ROOMS_DATA_PATH = os.getenv("ROOMS_DATA_PATH", "./tables/rooms_data")
 HOTELS_STATISTICS_PATH = os.getenv("HOTELS_STATISTICS_PATH", "./tables/hotels_statistics")
 DATABASE_FILE_PATH = os.getenv("DATABASE_FILE", "./databases/af_all_2024.csv")
 DISTANCES_FILE_PATH = os.getenv("CITY_CENTER_AND_SEA_DISTANCES_FILE", "./databases/hotels_city_center_and_sea_distances.csv")
+DISTRICTS_FILE_PATH = os.getenv("DISTRICTS_FILE_PATH", "./databases/city_districts.json")
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "813117111")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-ENDPOINT = os.getenv("YDB_ENDPOINT", "grpcs://ydb.serverless.yandexcloud.net:2135")
-DATABASE = os.getenv("YDB_DATABASE", "/ru-central1/b1gs7dv1mdmlibsrgfcg/etnsktaerd45usdot87m")
+ENDPOINT = os.getenv("YDB_ENDPOINT")
+DATABASE = os.getenv("YDB_DATABASE")
 
-AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH", "./authorized_key.json")
+AUTH_TOKEN_PATH = os.getenv("AUTHORIZED_KEY_PATH")
 CREDENTIALS = ydb.iam.ServiceAccountCredentials.from_file(AUTH_TOKEN_PATH)
 
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/logging.log")
@@ -42,6 +43,8 @@ logging.basicConfig(
 logging.info("Скрипт запущен")
 
 bot = Bot(token=TELEGRAM_TOKEN) if TELEGRAM_TOKEN and TELEGRAM_CHAT_ID else None
+with open(DISTRICTS_FILE_PATH, "r", encoding="utf-8") as f:
+    city_to_district = json.load(f)
 
 async def send_telegram_message(message):
     if bot:
@@ -76,7 +79,7 @@ def update_file_data(new_data, file_path):
     except Exception as e:
         logging.error(f"Ошибка при обновлении файла {file_path}: {e}")
 
-def extract_hotel_data(hotel):
+def extract_hotel_data(hotel, city):
     try:
         return {
             "city": hotel.get("city_name", None),
@@ -96,7 +99,7 @@ def extract_hotel_data(hotel):
             "rating.meal": hotel.get("reviews_summary", {}).get("meal", None),
             "lon": hotel.get("coords", [])[0],
             "lat": hotel.get("coords", [])[1],
-            "district": hotel.get("district_id", None),
+            "district": city_to_district.get(city, None),
             "id": f"{hotel.get('id', None)}_101hotels",
             "url": hotel.get("url", None),
             "description": hotel.get("description", None),
@@ -199,7 +202,7 @@ async def get_hotels_info(session, city, extract_date, start_date, end_date, pag
                 logging.info(f"Нет данных в ответе API для {city}, страница {page}")
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), hotels_amount
 
-            hotels_info_database = pd.json_normalize([extract_hotel_data(hotel) for hotel in hotels])
+            hotels_info_database = pd.json_normalize([extract_hotel_data(hotel, city) for hotel in hotels])
             if hotels_info_database.empty:
                 logging.warning(f"Нет данных для города {city}, страница {page}")
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), hotels_amount
