@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 from telegram import Bot
 import sys
 from datetime import datetime
-from decimal import Decimal
 from geopy.distance import geodesic
 import time
 
