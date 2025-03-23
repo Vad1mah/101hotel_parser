@@ -1,4 +1,5 @@
 import json
+import csv
 import os
 import pandas as pd
 import datetime as dt
@@ -9,6 +10,9 @@ from dotenv import load_dotenv
 from telegram import Bot
 import sys
 from datetime import datetime
+from decimal import Decimal
+from geopy.distance import geodesic
+import time
 
 import ydb
 import ydb.iam
@@ -46,6 +50,28 @@ bot = Bot(token=TELEGRAM_TOKEN) if TELEGRAM_TOKEN and TELEGRAM_CHAT_ID else None
 with open(DISTRICTS_FILE_PATH, "r", encoding="utf-8") as f:
     city_to_district = json.load(f)
 
+baykal_districts_lat_lon = {}
+with open(DATABASE_FILE_PATH, encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        if "/cities/baykal/" in row.get("url", ""):
+            coords = (row.get("lat", 0), row.get("lon", 0))
+            baykal_districts_lat_lon[coords] = row.get("district")
+
+def find_nearest_district(lat, lon):
+    min_distance = float("inf")
+    nearest_district = None
+    hotel_coords = (lat, lon)
+    
+    for coords, district in baykal_districts_lat_lon.items():
+        distance = geodesic(hotel_coords, coords).meters
+        print(distance, district)
+        if distance < min_distance:
+            min_distance = distance
+            nearest_district = district
+    
+    return nearest_district         
+
 async def send_telegram_message(message):
     if bot:
         try:
@@ -81,6 +107,10 @@ def update_file_data(new_data, file_path):
 
 def extract_hotel_data(hotel, city):
     try:
+        if city == "baykal":
+            district = find_nearest_district(hotel.get("coords", [])[1], hotel.get("coords", [])[0])
+        else:
+            district = city_to_district.get(city, None)
         return {
             "city": hotel.get("city_name", None),
             "full_name": hotel.get("full_name", None),
@@ -99,7 +129,7 @@ def extract_hotel_data(hotel, city):
             "rating.meal": hotel.get("reviews_summary", {}).get("meal", None),
             "lon": hotel.get("coords", [])[0],
             "lat": hotel.get("coords", [])[1],
-            "district": city_to_district.get(city, None),
+            "district": district,
             "id": f"{hotel.get('id', None)}_101hotels",
             "url": hotel.get("url", None),
             "description": hotel.get("description", None),
@@ -260,6 +290,53 @@ def get_tables_queries(table_name, dir):
             AUTO_PARTITIONING_BY_LOAD = ENABLED
         );
         """
+    elif dir == "databases":
+        create_table_query = f"""
+        PRAGMA TablePathPrefix("{DATABASE}/{dir}");
+
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            city Utf8,
+            full_name Utf8,
+            name Utf8,
+            number_reviews Int64,
+            rating Double,
+            min_price Double,
+            rooms_number Int16,
+            rating_number_scores Int32,
+            rating_total Double,
+            rating_quality_of_sleep Double,
+            rating_location Double,
+            rating_service Double,
+            rating_value_for_money Double,
+            rating_cleanness Double,
+            rating_meal Double,
+            lon Double,
+            lat Double,
+            district Utf8,
+            id Utf8 NOT NULL,
+            url Utf8,
+            description Utf8,
+            ota_hotel_id Int64,
+            rates Utf8,
+            address Utf8,
+            kind Utf8,
+            region_id Double,
+            region_name Utf8,
+            room_groups Utf8,
+            star_rating Int8,
+            region_is_beach_region Int8,
+            search_region_center_distance Double,
+            hotel_lookup_info_looked_up_count Double,
+            type Utf8,
+            rating_room Double,
+            rating_check_in_check_out Double,
+            beds_number Int16,
+            source Utf8,
+            PRIMARY KEY (id)
+        ) WITH (
+            AUTO_PARTITIONING_BY_LOAD = ENABLED
+        );
+        """
         
     return create_table_query
     
@@ -274,37 +351,87 @@ def create_ydb_table(driver_config, create_table_query, table_name):
         except Exception as e:
             logging.error(f"Не удалось создать таблицу {table_name}: {e}")
             
-def upsert_csv_to_ydb(driver_config, csv_file_to_import, table_name, ydb_dir, date):  
+def upsert_csv_to_ydb(driver_config, csv_path_to_import, table_name, ydb_dir, date):  
     with ydb.Driver(driver_config) as driver:
         driver.wait(fail_fast=True, timeout=20)
         session = driver.table_client.session().create()
 
-        delete_old_data = f"""
-        PRAGMA TablePathPrefix("{DATABASE}/{ydb_dir}");
-        DELETE FROM {table_name} WHERE date = Date('{date}');
-        """
+        if table_name == "af_all_2024":
+            with open(csv_path_to_import, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
 
-        try:
-            session.transaction().execute(delete_old_data, commit_tx=True)
-            logging.info(f"Удалены старые данные за {date} в {table_name}.")
-        except Exception as e:
-            logging.warning(f"Не удалось удалить старые данные за {date}: {e}")
+            query_template = f"""
+            PRAGMA TablePathPrefix("{DATABASE}/{ydb_dir}");
+            
+            UPSERT INTO {table_name} ( id, city, name, min_price, rooms_number, lon, lat, district )
+            VALUES
+            """
+            
+            batch = []
+            def safe_value(value, is_string=True):
+                if value is None or value == '':
+                    return "NULL" if not is_string else "''"
+                return "'{}'".format(value.replace("'", "''")) if is_string else str(value)
+            
+            for row in rows:
+                if row.get("source") == "101hotels":
+                    batch.append(f"""(
+                        {safe_value(row['id'])},
+                        {safe_value(row['city'])},
+                        {safe_value(row['name'])},
+                        {safe_value(row['min_price'], False)},
+                        {safe_value(row['rooms_number'], False)},
+                        {safe_value(row['lon'], False)},
+                        {safe_value(row['lat'], False)},
+                        {safe_value(row['district'])}
+                    )""")
+                
+                if len(batch) >= 200:
+                    try:
+                        query = query_template + ",\n".join(batch) + ";"
+                        session.transaction().execute(query, commit_tx=True)
+                        logging.info(f"Обновлено {len(batch)} записей в YDB.")
+                        time.sleep(5)
+                    except Exception as e:
+                        logging.error(f"Ошибка при UPSERT в YDB: {e}")
+                    batch = []
 
-        command = [
-            "ydb",
-            "-e", ENDPOINT,
-            "-d", DATABASE,
-            "--sa-key-file", AUTH_TOKEN_PATH,
-            "import", "file", "csv",
-            "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
-            "--header", csv_file_to_import
-        ]
-        
-        try:
-            subprocess.run(command, check=True, text=True, capture_output=True)
-            logging.info("Импорт CSV в YDB прошёл успешно")
-        except subprocess.CalledProcessError as e:
-            logging.error("Ошибка импорта CSV в YDB:", e.stderr)
+            if batch:
+                try:
+                    query = query_template + ",\n".join(batch) + ";"
+                    session.transaction().execute(query, commit_tx=True)
+                    logging.info(f"Обновлено {len(batch)} записей в YDB.")
+                except Exception as e:
+                    logging.error(f"Ошибка при UPSERT в YDB: {e}")
+
+        else:
+            delete_old_data = f"""
+            PRAGMA TablePathPrefix("{DATABASE}/{ydb_dir}");
+            DELETE FROM {table_name} WHERE date = Date('{date}');
+            """
+
+            try:
+                session.transaction().execute(delete_old_data, commit_tx=True)
+                logging.info(f"Удалены старые данные за {date} в {table_name}.")
+            except Exception as e:
+                logging.warning(f"Не удалось удалить старые данные за {date}: {e}")
+
+            command = [
+                "ydb",
+                "-e", ENDPOINT,
+                "-d", DATABASE,
+                "--sa-key-file", AUTH_TOKEN_PATH,
+                "import", "file", "csv",
+                "-p", f"{DATABASE}/{ydb_dir}/{table_name}",
+                "--header", csv_path_to_import
+            ]
+            
+            try:
+                subprocess.run(command, check=True, text=True, capture_output=True)
+                logging.info("Импорт CSV в YDB прошёл успешно")
+            except subprocess.CalledProcessError as e:
+                logging.error("Ошибка импорта CSV в YDB:", e.stderr)
 
 async def parse_101hotels_async():
     try:
@@ -372,18 +499,24 @@ async def parse_101hotels_async():
             
             rooms_data_table_name = "rooms_data"
             hotels_statistic_table_name = "hotels_statistics"
+            database_table_name = "af_all_2024"
             
             driver_config = ydb.DriverConfig(ENDPOINT, DATABASE, credentials=CREDENTIALS)
             create_table_query = get_tables_queries("rooms_data", dir="rooms_data")
-            create_ydb_table(driver_config, create_table_query, table_name="rooms_data")
+            create_ydb_table(driver_config, create_table_query, table_name=rooms_data_table_name)
             
             create_table_query = get_tables_queries("hotels_statistics", dir="hotels_statistics")
-            create_ydb_table(driver_config, create_table_query, table_name="hotels_statistics")
+            create_ydb_table(driver_config, create_table_query, table_name=hotels_statistic_table_name)
+            
+            create_table_query = get_tables_queries("af_all_2024", dir="databases")
+            create_ydb_table(driver_config, create_table_query, table_name=database_table_name)
 
             upsert_csv_to_ydb(driver_config, rooms_data_file_path, rooms_data_table_name, "rooms_data", extract_date)
-            await send_telegram_message(f"Таблица {rooms_data_table_name} создана")
+            await send_telegram_message(f"Таблица {rooms_data_table_name} обновлена/создана")
             upsert_csv_to_ydb(driver_config, hotels_statistic_file_path, hotels_statistic_table_name, "hotels_statistics", extract_date)
-            await send_telegram_message(f"Таблица {hotels_statistic_table_name} создана")
+            await send_telegram_message(f"Таблица {hotels_statistic_table_name} обновлена/создана")
+            upsert_csv_to_ydb(driver_config, DATABASE_FILE_PATH, database_table_name, "databases", extract_date)
+            await send_telegram_message(f"Таблица {database_table_name} обновлена/создана")
             
     except Exception as e:
         logging.error(f"Ошибка при парсинге всех городов: {e}")
