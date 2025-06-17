@@ -229,3 +229,4 @@ id,city_center_distances,sea_distances
 3365_101hotels,"{""385"": 0.8}","{""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 1270, ""auto_manual"": 1}, ""981575787"": {""name"": ""Река Солзан"", ""genitive"": ""реки Солзан"", ""distance"": 2450, ""auto_manual"": 1}}"
 15203_101hotels,"{""793"": 0.2}","{""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 998, ""auto_manual"": 0}}"
 559425_101hotels,"{""583"": 4.2}","{""10550773"": {""name"": ""Залив Мухор"", ""genitive"": ""Залива Мухор"", ""distance"": 384, ""auto_manual"": 0}, ""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 13954, ""auto_manual"": 0}}"
+514181_101hotels,"{""475"": 0.1}","{""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 865, ""auto_manual"": 1}}"
