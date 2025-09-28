@@ -20591,3 +20591,82 @@
 2025-09-27 00:44:22,927 - INFO - Начало парсинга города: ust-ilimsk
 2025-09-27 00:44:23,057 - WARNING - Ошибка 404 для ust-ilimsk, страница 1
 2025-09-27 00:44:23,167 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:37,583 - INFO - Скрипт запущен
+2025-09-28 00:52:37,697 - INFO - Начало парсинга города: huzhir
+2025-09-28 00:52:38,583 - WARNING - Ошибка 404 для huzhir, страница 1
+2025-09-28 00:52:39,227 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:39,228 - INFO - Начало парсинга города: sahyurta
+2025-09-28 00:52:39,763 - WARNING - Ошибка 404 для sahyurta, страница 1
+2025-09-28 00:52:39,891 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:39,892 - INFO - Начало парсинга города: harantsi
+2025-09-28 00:52:40,448 - WARNING - Ошибка 404 для harantsi, страница 1
+2025-09-28 00:52:40,577 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:40,578 - INFO - Начало парсинга города: sarma
+2025-09-28 00:52:40,740 - WARNING - Ошибка 404 для sarma, страница 1
+2025-09-28 00:52:40,867 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:40,868 - INFO - Начало парсинга города: kurma
+2025-09-28 00:52:41,026 - WARNING - Ошибка 404 для kurma, страница 1
+2025-09-28 00:52:41,154 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:41,154 - INFO - Начало парсинга города: buguldeyka
+2025-09-28 00:52:41,311 - WARNING - Ошибка 404 для buguldeyka, страница 1
+2025-09-28 00:52:41,438 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:41,439 - INFO - Начало парсинга города: shida
+2025-09-28 00:52:41,601 - WARNING - Ошибка 404 для shida, страница 1
+2025-09-28 00:52:41,728 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:41,729 - INFO - Начало парсинга города: agaluy
+2025-09-28 00:52:41,887 - WARNING - Ошибка 404 для agaluy, страница 1
+2025-09-28 00:52:42,015 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:42,016 - INFO - Начало парсинга города: sayansk
+2025-09-28 00:52:42,171 - WARNING - Ошибка 404 для sayansk, страница 1
+2025-09-28 00:52:42,301 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:42,302 - INFO - Начало парсинга города: slyudyanka
+2025-09-28 00:52:42,464 - WARNING - Ошибка 404 для slyudyanka, страница 1
+2025-09-28 00:52:42,593 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:42,594 - INFO - Начало парсинга города: baikalsk
+2025-09-28 00:52:42,755 - WARNING - Ошибка 404 для baikalsk, страница 1
+2025-09-28 00:52:42,883 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:42,884 - INFO - Начало парсинга города: utulik
+2025-09-28 00:52:43,038 - WARNING - Ошибка 404 для utulik, страница 1
+2025-09-28 00:52:43,166 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:43,167 - INFO - Начало парсинга города: mangutay
+2025-09-28 00:52:43,330 - WARNING - Ошибка 404 для mangutay, страница 1
+2025-09-28 00:52:43,457 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:43,458 - INFO - Начало парсинга города: kultuk
+2025-09-28 00:52:43,617 - WARNING - Ошибка 404 для kultuk, страница 1
+2025-09-28 00:52:43,744 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:43,745 - INFO - Начало парсинга города: baykal
+2025-09-28 00:52:43,899 - WARNING - Ошибка 404 для baykal, страница 1
+2025-09-28 00:52:44,051 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:44,051 - INFO - Начало парсинга города: angarsk
+2025-09-28 00:52:44,213 - WARNING - Ошибка 404 для angarsk, страница 1
+2025-09-28 00:52:44,342 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:44,342 - INFO - Начало парсинга города: savvateevka
+2025-09-28 00:52:44,502 - WARNING - Ошибка 404 для savvateevka, страница 1
+2025-09-28 00:52:44,638 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:44,639 - INFO - Начало парсинга города: leestvyanka
+2025-09-28 00:52:44,795 - WARNING - Ошибка 404 для leestvyanka, страница 1
+2025-09-28 00:52:44,923 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:44,923 - INFO - Начало парсинга города: irkutsk
+2025-09-28 00:52:45,085 - WARNING - Ошибка 404 для irkutsk, страница 1
+2025-09-28 00:52:45,222 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:45,223 - INFO - Начало парсинга города: nikola
+2025-09-28 00:52:45,381 - WARNING - Ошибка 404 для nikola, страница 1
+2025-09-28 00:52:45,509 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:45,509 - INFO - Начало парсинга города: bolshoe_goloustnoe
+2025-09-28 00:52:45,665 - WARNING - Ошибка 404 для bolshoe_goloustnoe, страница 1
+2025-09-28 00:52:45,798 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:45,799 - INFO - Начало парсинга города: granovshchina
+2025-09-28 00:52:45,957 - WARNING - Ошибка 404 для granovshchina, страница 1
+2025-09-28 00:52:46,092 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:46,092 - INFO - Начало парсинга города: hayryuzovka
+2025-09-28 00:52:46,251 - WARNING - Ошибка 404 для hayryuzovka, страница 1
+2025-09-28 00:52:46,378 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:46,379 - INFO - Начало парсинга города: bolshie_koti
+2025-09-28 00:52:46,535 - WARNING - Ошибка 404 для bolshie_koti, страница 1
+2025-09-28 00:52:46,667 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:46,667 - INFO - Начало парсинга города: patroni
+2025-09-28 00:52:46,825 - WARNING - Ошибка 404 для patroni, страница 1
+2025-09-28 00:52:46,956 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2025-09-28 00:52:46,956 - INFO - Начало парсинга города: ust-ilimsk
+2025-09-28 00:52:47,114 - WARNING - Ошибка 404 для ust-ilimsk, страница 1
+2025-09-28 00:52:47,243 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
