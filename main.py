@@ -215,7 +215,8 @@ def extract_statistic_data(date, rooms, hotel_id, min_price, rooms_num):
 
 async def get_hotels_info(session, city, extract_date, start_date, end_date, page):
     try:
-        url = f"https://api.101hotels.com/hotel/available/city/russia/{city}?sort_direction=desc&in={start_date}&out={end_date}&adults=1&page={page}"
+        url = f"https://ssg.101hotels.com/hotel/available/city/russia/{city}?sort_direction=desc&in={start_date}&out={end_date}&adults=1&page={page}&scenario=desktop"
+        
         async with session.get(url) as response:
             if response.status != 200:
                 logging.warning(f"Ошибка {response.status} для {city}, страница {page}")
