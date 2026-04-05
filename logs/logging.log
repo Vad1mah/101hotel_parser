@@ -37243,3 +37243,94 @@
 2026-04-04 01:11:30,925 - INFO - Closing channel for endpoint ru-central1-b-ncmkh.ydb.serverless.yandexcloud.net:2135
 2026-04-04 01:11:30,925 - INFO - Successfully terminated discovery process
 2026-04-04 01:11:31,234 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:10,378 - INFO - Скрипт запущен
+2026-04-05 01:20:10,494 - INFO - Начало парсинга города: huzhir
+2026-04-05 01:20:11,638 - INFO - Обработано отелей: 10 из 10 для города huzhir, страница 1
+2026-04-05 01:20:11,640 - INFO - Начало парсинга города: sahyurta
+2026-04-05 01:20:12,365 - INFO - Обработано отелей: 3 из 3 для города sahyurta, страница 1
+2026-04-05 01:20:12,367 - INFO - Начало парсинга города: harantsi
+2026-04-05 01:20:13,001 - INFO - Обработано отелей: 6 из 6 для города harantsi, страница 1
+2026-04-05 01:20:13,003 - INFO - Начало парсинга города: sarma
+2026-04-05 01:20:13,418 - INFO - Нет данных в ответе API для sarma, страница 1
+2026-04-05 01:20:13,789 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:13,790 - INFO - Начало парсинга города: kurma
+2026-04-05 01:20:14,124 - INFO - Обработано отелей: 1 из 1 для города kurma, страница 1
+2026-04-05 01:20:14,125 - INFO - Начало парсинга города: buguldeyka
+2026-04-05 01:20:14,480 - INFO - Обработано отелей: 1 из 1 для города buguldeyka, страница 1
+2026-04-05 01:20:14,482 - INFO - Начало парсинга города: shida
+2026-04-05 01:20:14,773 - INFO - Нет данных в ответе API для shida, страница 1
+2026-04-05 01:20:14,883 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:14,884 - INFO - Начало парсинга города: agaluy
+2026-04-05 01:20:15,211 - INFO - Обработано отелей: 1 из 1 для города agaluy, страница 1
+2026-04-05 01:20:15,212 - INFO - Начало парсинга города: sayansk
+2026-04-05 01:20:15,616 - INFO - Обработано отелей: 1 из 1 для города sayansk, страница 1
+2026-04-05 01:20:15,617 - INFO - Начало парсинга города: slyudyanka
+2026-04-05 01:20:15,952 - INFO - Обработано отелей: 3 из 3 для города slyudyanka, страница 1
+2026-04-05 01:20:15,953 - INFO - Начало парсинга города: baikalsk
+2026-04-05 01:20:16,598 - INFO - Обработано отелей: 11 из 11 для города baikalsk, страница 1
+2026-04-05 01:20:16,599 - INFO - Начало парсинга города: utulik
+2026-04-05 01:20:16,928 - INFO - Нет данных в ответе API для utulik, страница 1
+2026-04-05 01:20:17,040 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:17,041 - INFO - Начало парсинга города: mangutay
+2026-04-05 01:20:17,394 - INFO - Обработано отелей: 1 из 1 для города mangutay, страница 1
+2026-04-05 01:20:17,395 - INFO - Начало парсинга города: kultuk
+2026-04-05 01:20:17,737 - INFO - Обработано отелей: 3 из 3 для города kultuk, страница 1
+2026-04-05 01:20:17,738 - INFO - Начало парсинга города: baykal
+2026-04-05 01:20:18,097 - INFO - Нет данных в ответе API для baykal, страница 1
+2026-04-05 01:20:18,208 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:18,209 - INFO - Начало парсинга города: angarsk
+2026-04-05 01:20:18,773 - INFO - Обработано отелей: 6 из 6 для города angarsk, страница 1
+2026-04-05 01:20:18,774 - INFO - Начало парсинга города: savvateevka
+2026-04-05 01:20:19,059 - INFO - Нет данных в ответе API для savvateevka, страница 1
+2026-04-05 01:20:19,172 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:19,173 - INFO - Начало парсинга города: leestvyanka
+2026-04-05 01:20:19,890 - INFO - Обработано отелей: 21 из 22 для города leestvyanka, страница 1
+2026-04-05 01:20:20,202 - INFO - Обработано отелей: 22 из 22 для города leestvyanka, страница 2
+2026-04-05 01:20:20,205 - INFO - Начало парсинга города: irkutsk
+2026-04-05 01:20:21,254 - INFO - Обработано отелей: 21 из 120 для города irkutsk, страница 1
+2026-04-05 01:20:21,759 - INFO - Обработано отелей: 42 из 120 для города irkutsk, страница 2
+2026-04-05 01:20:22,277 - INFO - Обработано отелей: 63 из 120 для города irkutsk, страница 3
+2026-04-05 01:20:22,906 - INFO - Обработано отелей: 84 из 120 для города irkutsk, страница 4
+2026-04-05 01:20:23,496 - INFO - Обработано отелей: 105 из 120 для города irkutsk, страница 5
+2026-04-05 01:20:24,012 - INFO - Обработано отелей: 120 из 120 для города irkutsk, страница 6
+2026-04-05 01:20:24,016 - INFO - Начало парсинга города: nikola
+2026-04-05 01:20:24,536 - INFO - Обработано отелей: 6 из 6 для города nikola, страница 1
+2026-04-05 01:20:24,537 - INFO - Начало парсинга города: bolshoe_goloustnoe
+2026-04-05 01:20:24,906 - INFO - Обработано отелей: 1 из 1 для города bolshoe_goloustnoe, страница 1
+2026-04-05 01:20:24,907 - INFO - Начало парсинга города: granovshchina
+2026-04-05 01:20:25,206 - INFO - Нет данных в ответе API для granovshchina, страница 1
+2026-04-05 01:20:25,498 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:25,499 - INFO - Начало парсинга города: hayryuzovka
+2026-04-05 01:20:25,807 - INFO - Нет данных в ответе API для hayryuzovka, страница 1
+2026-04-05 01:20:25,919 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:25,920 - INFO - Начало парсинга города: bolshie_koti
+2026-04-05 01:20:26,275 - INFO - Нет данных в ответе API для bolshie_koti, страница 1
+2026-04-05 01:20:26,384 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:26,385 - INFO - Начало парсинга города: patroni
+2026-04-05 01:20:26,905 - INFO - Обработано отелей: 1 из 1 для города patroni, страница 1
+2026-04-05 01:20:26,906 - INFO - Начало парсинга города: ust-ilimsk
+2026-04-05 01:20:27,250 - INFO - Обработано отелей: 1 из 1 для города ust-ilimsk, страница 1
+2026-04-05 01:20:27,423 - INFO - Файл ./databases/af_all_2024.csv обновлен. Обновлено/добавлено строк: 183
+2026-04-05 01:20:27,429 - INFO - Файл ./databases/hotels_city_center_and_sea_distances.csv обновлен. Обновлено/добавлено строк: 183
+2026-04-05 01:20:27,540 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:28,070 - INFO - Cached token reached refresh_in deadline, current time 1775352028.070615, deadline 0
+2026-04-05 01:20:28,905 - INFO - Token refresh successful. current_time 1775352028.070615, refresh_in 1775353828.9053745
+2026-04-05 01:20:30,835 - INFO - Closing channel for endpoint ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:31,291 - INFO - Обновлено 183 записей в YDB.
+2026-04-05 01:20:31,291 - INFO - Closing channel for endpoint ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:31,291 - INFO - Closing channel for endpoint ru-central1-a-hsbvz.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:31,291 - INFO - Closing channel for endpoint ru-central1-b-ncmkh.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:31,291 - INFO - Closing channel for endpoint ru-central1-d-fyfte.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:31,291 - INFO - Successfully terminated discovery process
+2026-04-05 01:20:31,400 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
+2026-04-05 01:20:33,105 - INFO - Closing channel for endpoint ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:33,813 - INFO - Обновлено 200 записей в YDB.
+2026-04-05 01:20:40,143 - INFO - Обновлено 200 записей в YDB.
+2026-04-05 01:20:46,493 - INFO - Обновлено 200 записей в YDB.
+2026-04-05 01:20:52,015 - INFO - Обновлено 58 записей в YDB.
+2026-04-05 01:20:52,015 - INFO - Closing channel for endpoint ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:52,015 - INFO - Closing channel for endpoint ru-central1-d-fyfte.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:52,016 - INFO - Closing channel for endpoint ru-central1-a-hsbvz.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:52,016 - INFO - Closing channel for endpoint ru-central1-b-ncmkh.ydb.serverless.yandexcloud.net:2135
+2026-04-05 01:20:52,016 - INFO - Successfully terminated discovery process
+2026-04-05 01:20:52,310 - INFO - HTTP Request: POST https://api.telegram.org/bot7647110076:AAGCbk8JQ2YlY8OwqcHfGDWEiUHoWNtzOpw/sendMessage "HTTP/1.1 200 OK"
