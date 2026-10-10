@@ -296,3 +296,4 @@ id,city_center_distances,sea_distances
 1815_101hotels,"{""22"": 3.3}",
 678825_101hotels,"{""530"": 108.4}","{""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 18193, ""auto_manual"": 0}}"
 679071_101hotels,"{""22"": 4.2}",
+9198_101hotels,"{""582"": 3.6, ""3347"": 2.4}","{""10550773"": {""name"": ""Залив Мухор"", ""genitive"": ""Залива Мухор"", ""distance"": 579, ""auto_manual"": 1}, ""133"": {""name"": ""Байкал"", ""genitive"": ""Байкала"", ""distance"": 590, ""auto_manual"": 1}}"
